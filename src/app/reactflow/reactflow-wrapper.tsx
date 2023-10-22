@@ -11,11 +11,11 @@ import {
     ViewEncapsulation,
   } from '@angular/core';
   import * as React from 'react';
-  import { OnInit as ROnInit, Node, Connection, NodeChange, EdgeChange, OnConnectStartParams, ReactFlowInstance, OnSelectionChangeParams } from 'reactflow';
-  import { ReactFlowWrappableComponent } from './reactflow';
+  import { Node, Connection, NodeChange, EdgeChange, OnConnectStartParams, ReactFlowInstance, OnSelectionChangeParams, MarkerType } from 'reactflow';
+  import { IReactFlowProps, FlowWrapperComponent } from './reactflow';
   import { createRoot, Root } from 'react-dom/client';
-  import { Edge, DefaultEdgeOptions, NodeMouseHandler, NodeDragHandler, OnEdgeUpdateFunc, EdgeMouseHandler, HandleType, OnNodesChange, OnEdgesChange, OnNodesDelete, OnEdgesDelete, SelectionDragHandler, OnConnect, OnConnectStart, OnConnectEnd, OnMove, OnSelectionChangeFunc, NodeTypes, EdgeTypes, ConnectionLineType, ConnectionLineComponent, ConnectionMode, KeyCode, NodeOrigin, Viewport, CoordinateExtent, PanOnScrollMode, FitViewOptions, PanelPosition, ProOptions, OnError } from 'reactflow';
-  
+  import { Edge, DefaultEdgeOptions, HandleType, NodeTypes, EdgeTypes, ConnectionLineType, ConnectionLineComponent, ConnectionMode, KeyCode, NodeOrigin, Viewport, CoordinateExtent, PanOnScrollMode, FitViewOptions, PanelPosition, ProOptions, OnError } from 'reactflow';
+
   @Component({
       selector: 'react-flow',
       template: ``,
@@ -23,14 +23,24 @@ import {
       encapsulation: ViewEncapsulation.None
   })
   export class ReactFlowWrapperComponent implements OnChanges, OnDestroy, AfterViewInit {
-  
+
     private _root: Root;
-  
+    private _defaultEdgeOptions: DefaultEdgeOptions = {
+        animated: true,
+        markerEnd: {
+            type: MarkerType.ArrowClosed,
+          },
+    }
+
     @Input() nodes?: Node<any, string | undefined>[] | undefined;
     @Input() edges?: Edge<any>[] | undefined;
     @Input() defaultNodes?: Node<any, string | undefined>[] | undefined;
     @Input() defaultEdges?: Edge<any>[] | undefined;
-    @Input() defaultEdgeOptions?: DefaultEdgeOptions | undefined;
+    @Input() set defaultEdgeOptions(value: DefaultEdgeOptions) {
+        if (value) {
+            this._defaultEdgeOptions = value;
+        }
+    };
 
     @Output() onNodeClick = new EventEmitter<[MouseEvent, Node]>();
     @Output() onNodeDoubleClick = new EventEmitter<[MouseEvent, Node]>();
@@ -154,7 +164,7 @@ import {
             return filteredProps;
         }, {});
     }
-    
+
     private _getEmitters(keys: string[]): Record<string, (...args: unknown[]) => void> {
         return keys.reduce((eventEmitters, key) => {
             eventEmitters[key] = (...args) => this[key].next(args);
@@ -166,20 +176,21 @@ import {
         if (!this._root) {
             this._root = createRoot(this.ngContainer.element.nativeElement);
         }
-    
+
         const filteredKeys = Object.keys(this)
             .filter(key => !key.startsWith('_') && !key.startsWith('ng'));
 
         const propKeys = filteredKeys.filter(key => !key.startsWith("on"));
         const eventKeys = filteredKeys.filter(key => key.startsWith("on"));
 
-        const props = {
-            ...this._getInputProperties(propKeys),
-            ...this._getEmitters(eventKeys),
+        const reactFlow: IReactFlowProps = {
+            props: {
+                ...this._getInputProperties(propKeys),
+                ...this._getEmitters(eventKeys),
+            }
         };
+        reactFlow.props.defaultEdgeOptions = this._defaultEdgeOptions;
 
-        console.log(props);
-    
-        this._root.render(<ReactFlowWrappableComponent props={props} />);
+        this._root.render(<FlowWrapperComponent props={reactFlow.props} />);
     }
   }

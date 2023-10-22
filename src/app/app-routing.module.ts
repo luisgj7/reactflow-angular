@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ReactFlowWrappableComponent } from './reactflow/reactflow';
+import { FlowWrapperComponent } from './reactflow/reactflow';
 
 const routes: Routes = [
   { path: '', loadChildren: async() => (await import('./workflow/workflow.module')).WorkflowModule  }

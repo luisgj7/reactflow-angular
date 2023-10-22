@@ -9,10 +9,11 @@ import ReactFlow, {
   applyNodeChanges,
   applyEdgeChanges
 } from 'reactflow';
-import { useValidatorFn } from '../reactflow-common';
 import { nodes as initialNodes, edges as initialEdges } from '../initial-elements';
 import { IReactFlowProps } from '../reactflow';
 import { Start } from '../custom-nodes/start'
+import { End } from '../custom-nodes/end';
+import { Decision } from '../custom-nodes/decision';
 
 export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
     const minimapStyle = {
@@ -26,8 +27,16 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
     const [edges, setEdges] = useEdgesState(initialEdges as any);
     const onConnect = React.useCallback((params) => setEdges((eds) => addEdge(params, eds)), []);
 
+    const onConnectStart = React.useCallback(
+        (_, { nodeId, handleType }) => {
+            console.log('on connect start: ', ({ nodeId, handleType }));
+        }, [props]
+    );
+
     const onNodesChange = React.useCallback(
-        (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
+        (changes) => {
+            setNodes((nds) => applyNodeChanges(changes, nds))
+        },
         [setNodes]
       );
 
@@ -40,7 +49,7 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
         event.preventDefault();
         event.dataTransfer.dropEffect = 'move';
       }, []);
-    
+
     const onDrop = React.useCallback(
         (event) => {
             event.preventDefault();
@@ -72,7 +81,7 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
     );
 
     return (
-        <div style={{ height: 800, width:1200 }} ref={reactFlowWrapper}> 
+        <div className="flow-content" ref={reactFlowWrapper}>
             <ReactFlow
                 nodes={nodes}
                 edges={edges}
@@ -112,7 +121,7 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
                 onSelectionEnd={props.onSelectionEnd}
                 onSelectionContextMenu={props.onSelectionContextMenu}
                 onConnect={onConnect}
-                onConnectStart={props.onConnectStart}
+                onConnectStart={onConnectStart}
                 onConnectEnd={props.onConnectEnd}
                 onClickConnectStart={props.onClickConnectStart}
                 onClickConnectEnd={props.onClickConnectEnd}
@@ -126,7 +135,7 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
                 onPaneMouseEnter={props.onPaneMouseEnter}
                 onPaneMouseMove={props.onPaneMouseMove}
                 onPaneMouseLeave={props.onPaneMouseLeave}
-                nodeTypes={props.nodeTypes}
+                nodeTypes={nodeTypes}
                 edgeTypes={props.edgeTypes}
                 connectionLineType={props.connectionLineType}
                 connectionLineStyle={props.connectionLineStyle}
@@ -182,8 +191,14 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
                 >
                 <MiniMap style={minimapStyle} zoomable pannable />
                 <Controls />
-                <Background color="#aaa" gap={16} />
+                <Background style={{ background: '#1c75bc', opacity: '4%'}} />
             </ReactFlow>
         </div>
     );
-}  
+}
+
+const nodeTypes = {
+  start: Start,
+  end: End,
+  decision: Decision
+}
