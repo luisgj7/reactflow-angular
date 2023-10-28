@@ -1,49 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
   selector: 'app-workflow-chart',
   templateUrl: './workflow-chart.component.html',
-  styleUrls: ['./workflow-chart.component.scss']
+  styleUrls: ['./workflow-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class WorkflowChartComponent implements OnInit {
-
-  initialNodes = [
-    {
-      id: '1',
-      type: 'input',
-      data: {
-        label: 'Input Node',
-      },
-      position: { x: 250, y: 0 },
-    },
-    {
-      id: '2',
-      data: {
-        label: 'Default Node',
-      },
-      position: { x: 100, y: 100 },
-    },
-    {
-      id: '3',
-      type: 'output',
-      data: {
-        label: 'Output Node',
-      },
-      position: { x: 400, y: 100 },
-    }
-  ]
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
+export class WorkflowChartComponent {
 
   onNodeClick(event: unknown): void {
    console.log(event);
-  }
-
-  onConnectStart(event: unknown): void {
-    console.log(event);
   }
 
   onNodeAdd(event: unknown): void {

@@ -54,6 +54,24 @@ export enum HandleDirection {
   SOURCE = 'source'
 }
 
+export enum CustomNodeTypes {
+  DECISION = 'decision',
+  START = 'start',
+  END = 'end',
+}
+
+export enum NodeColor {
+  START = '#57bf8d',
+  END = '#e14642',
+  DECISION = '#f1b46f',
+  DEFAULT = '#ddf3fd'
+}
+
+export interface DecisionLabelShape {
+  outRightConnection: string,
+  outBottomConnection: string
+}
+
 export interface IReactFlowProps {
   props: {
     nodes?: Node<any, string | undefined>[] | undefined;

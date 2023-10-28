@@ -7,54 +7,72 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   applyNodeChanges,
-  applyEdgeChanges
+  applyEdgeChanges,
+  Edge,
+  EdgeChange,
+  Node, Connection,
+  OnConnectStartParams,
+  NodeChange,
+  XYPosition,
+  NodeTypes
 } from 'reactflow';
 import { nodes as initialNodes, edges as initialEdges } from '../initial-elements';
-import { IReactFlowProps } from '../reactflow';
+import {DecisionLabelShape, IReactFlowProps} from '../reactflow';
 import { Start } from '../custom-nodes/start'
 import { End } from '../custom-nodes/end';
 import { Decision } from '../custom-nodes/decision';
+import { DragEvent } from "react";
+import { nextId, nodeColorFn, setNodeDataFn } from "../validators/handle-node";
 
 export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
     const minimapStyle = {
         height: 120,
     };
+    const decisionLabel: DecisionLabelShape = {
+      outRightConnection: "Yes",
+      outBottomConnection: "No"
+    }
 
     const reactFlowWrapper = React.useRef(null);
     const [reactFlowInstance, setReactFlowInstance] = React.useState(null);
+    const [isValidDrawLine, setIsValidDrawLine] = React.useState(false);
 
-    const [nodes, setNodes] = useNodesState(initialNodes as any);
+    const [nodes, setNodes] = useNodesState(initialNodes as any ?? []);
     const [edges, setEdges] = useEdgesState(initialEdges as any);
-    const onConnect = React.useCallback((params) => setEdges((eds) => addEdge(params, eds)), []);
+
+    const onConnect = React.useCallback(
+      (params: Connection) => setEdges((eds: Edge[]) => addEdge(params, eds)),
+      []);
 
     const onConnectStart = React.useCallback(
-        (_, { nodeId, handleType }) => {
-            console.log('on connect start: ', ({ nodeId, handleType }));
-        }, [props]
+        (_, { nodeId, handleType, handleId }: OnConnectStartParams ): void => {
+
+          console.log('on connect start: ', ({ nodeId, handleType, handleId }));
+        }, [ nodes, setIsValidDrawLine]
     );
 
     const onNodesChange = React.useCallback(
-        (changes) => {
-            setNodes((nds) => applyNodeChanges(changes, nds))
+        (changes: NodeChange[]): void => {
+            setNodes((nds: Node[]) => applyNodeChanges(changes, nds))
         },
         [setNodes]
       );
 
     const onEdgesChange = React.useCallback(
-        (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+        (changes: EdgeChange[]) => setEdges((eds: Edge[]) => applyEdgeChanges(changes, eds)),
         [setEdges]
     );
 
-    const onDragOver = React.useCallback((event) => {
+    const onDragOver = React.useCallback((event: DragEvent): void => {
         event.preventDefault();
         event.dataTransfer.dropEffect = 'move';
       }, []);
 
     const onDrop = React.useCallback(
-        (event) => {
+        (event: DragEvent): void => {
             event.preventDefault();
 
-            const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+            const reactFlowBounds: DOMRect = reactFlowWrapper.current.getBoundingClientRect();
             const type = event.dataTransfer.getData('application/reactflow');
 
             // check if the dropped element is valid
@@ -62,22 +80,25 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
                 return;
             }
 
-            const position = reactFlowInstance.project({
+            const position: XYPosition = reactFlowInstance.project({
                 x: event.clientX - reactFlowBounds.left,
                 y: event.clientY - reactFlowBounds.top,
             });
-            const newNode = {
-                id: window.crypto.randomUUID(),
+            const newNode: Node = setNodeDataFn(
+              {
+                id: nextId(),
                 type,
                 position,
                 data: { label: `${type} node` },
-            };
+              },
+              decisionLabel
+            );
 
-            setNodes((nds) => {
+            setNodes((nds: Node[]) => {
                 props.onNodeAdd(newNode);
                 return nds.concat(newNode);
             });
-        },[reactFlowInstance, props]
+        },[reactFlowInstance, props, decisionLabel]
     );
 
     return (
@@ -189,15 +210,15 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
                 connectionRadius={props.connectionRadius}
                 onError={props.onError}
                 >
-                <MiniMap style={minimapStyle} zoomable pannable />
-                <Controls />
-                <Background style={{ background: '#1c75bc', opacity: '4%'}} />
+                <MiniMap style={minimapStyle} nodeColor={nodeColorFn} nodeStrokeWidth={3} zoomable pannable  />
+                <Controls showInteractive={false} />
+                <Background style={{ background: '#72aadc', opacity: '4%'}} />
             </ReactFlow>
         </div>
     );
 }
 
-const nodeTypes = {
+const nodeTypes: NodeTypes = {
   start: Start,
   end: End,
   decision: Decision

@@ -66,28 +66,12 @@ export const nodes = [
     position: { x: 400, y: 325 },
     sourcePosition: Position.Right,
     targetPosition: Position.Left,
-  },
-  {
-    id: '7',
-    type: 'default',
-    className: 'annotation',
-    data: {
-      label: (
-        <>
-          On the bottom left you see the <strong>Controls</strong> and the bottom right the{' '}
-          <strong>MiniMap</strong>. This is also just a node 🥳
-        </>
-      ),
-    },
-    draggable: false,
-    selectable: false,
-    position: { x: 150, y: 400 },
-  },
+  }
 ];
 
 export const edges = [
   { id: 'e1-2', source: '1', target: '2', label: 'this is an edge label' },
-  //{ id: 'e1-3', source: '1', target: '3', animated: true },
+  { id: 'e1-3', source: '1', target: '3', animated: true },
   {
     id: 'e4-5',
     source: '4',
@@ -101,17 +85,17 @@ export const edges = [
       type: MarkerType.ArrowClosed,
     },
   },
-  // {
-  //   id: 'e4-6',
-  //   source: '4',
-  //   target: '6',
-  //   type: 'smoothstep',
-  //   sourceHandle: 'handle-1',
-  //   data: {
-  //     selectIndex: 1,
-  //   },
-  //   markerEnd: {
-  //     type: MarkerType.ArrowClosed,
-  //   },
-  // },
+  {
+    id: 'e4-6',
+    source: '4',
+    target: '6',
+    type: 'smoothstep',
+    sourceHandle: 'handle-1',
+    data: {
+      selectIndex: 1,
+    },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+    },
+  },
 ];
