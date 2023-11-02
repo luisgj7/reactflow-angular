@@ -12,7 +12,7 @@ export const isConnectableFn = (id: string, direction: HandleDirection, sourceHa
       const node: Node = getNode(id);
       return hasConnectionFn(node, getConnectedEdges([node], getEdges()), direction, sourceHandle);
     });
-  }, [getNode, getEdges, direction, edgesCount, sourceHandle]);
+  }, [direction, edgesCount, sourceHandle]);
 
   return hasConnections;
 };

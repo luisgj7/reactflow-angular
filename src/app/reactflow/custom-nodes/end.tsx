@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { Handle, Position } from "reactflow";
 import { HandleDirection } from "../reactflow";
+import { ComponentType, memo, MemoExoticComponent } from "react";
 
-export const End = (): React.ReactElement => {
+const EndNode = (): React.ReactElement => {
     return (
         <>
           End Node
@@ -13,3 +14,5 @@ export const End = (): React.ReactElement => {
         </>
     );
 };
+
+export const End: MemoExoticComponent<ComponentType> = memo(EndNode);

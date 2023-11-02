@@ -8,6 +8,43 @@ react-flow {
 
   .react-flow {
 
+    &__edge-path:hover {
+      stroke-width: 4;
+    }
+
+    &__edgelabel {
+      &-renderer {
+        &__content {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: absolute;
+          // everything inside EdgeLabelRenderer has no pointer events by default
+          // if you have an interactive element, set pointer-events: all
+          pointer-events: all;
+          //border: 1px solid red;
+          width: 50px;
+          height: 50px;
+          font-size: 12px;
+
+          &--button {
+            width: 25px;
+            height: 25px;
+            background: #eee;
+            border: 1px solid #fff;
+            cursor: pointer;
+            border-radius: 50%;
+            font-size: 12px;
+            line-height: 1;
+
+            &:hover {
+              box-shadow: 0 0 6px 2px rgba(0, 0, 0, 0.08);
+            }
+          }
+        }
+      }
+    }
+
     &__node {
       display: flex;
       border: none;
@@ -24,13 +61,13 @@ react-flow {
 
       &-decision {
         &.content {
-          width: 7.25rem;
-          height: 7.25rem;
+          width: 6.25rem;
+          height: 6.25rem;
         }
 
         &.shape {
-          width: 7.25rem;
-          height: 7.25rem;
+          width: 6.25rem;
+          height: 6.25rem;
           transform: translate(-50%, -50%) rotate(45deg);
           position: absolute;
           left: 50%;
@@ -126,6 +163,8 @@ react-flow {
       border: 2px solid #bdbdbd;
       background: #fff;
     }
+
+
   }
 
   .flow-content {

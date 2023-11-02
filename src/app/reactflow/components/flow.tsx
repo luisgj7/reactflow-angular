@@ -8,21 +8,21 @@ import ReactFlow, {
   useEdgesState,
   applyNodeChanges,
   applyEdgeChanges,
-  Edge,
   EdgeChange,
   Node, Connection,
   OnConnectStartParams,
   NodeChange,
   XYPosition,
-  NodeTypes
+  NodeTypes,
+  EdgeTypes,
+  useStoreApi
 } from 'reactflow';
 import { nodes as initialNodes, edges as initialEdges } from '../initial-elements';
-import {DecisionLabelShape, IReactFlowProps} from '../reactflow';
-import { Start } from '../custom-nodes/start'
-import { End } from '../custom-nodes/end';
-import { Decision } from '../custom-nodes/decision';
+import { DecisionLabelShape, IReactFlowProps } from '../reactflow';
+import { Start, Decision, End } from '../custom-nodes'
 import { DragEvent } from "react";
 import { nextId, nodeColorFn, setNodeDataFn } from "../validators/handle-node";
+import { ButtonEdge } from "../custom-edges/button-edge";
 
 export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
     const minimapStyle = {
@@ -33,6 +33,8 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
       outBottomConnection: "No"
     }
 
+    const store = useStoreApi();
+
     const reactFlowWrapper = React.useRef(null);
     const [reactFlowInstance, setReactFlowInstance] = React.useState(null);
     const [isValidDrawLine, setIsValidDrawLine] = React.useState(false);
@@ -41,7 +43,9 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
     const [edges, setEdges] = useEdgesState(initialEdges as any);
 
     const onConnect = React.useCallback(
-      (params: Connection) => setEdges((eds: Edge[]) => addEdge(params, eds)),
+      (params: Connection) => setEdges(() => {
+        return addEdge({...params}, store.getState().edges)
+      }),
       []);
 
     const onConnectStart = React.useCallback(
@@ -59,7 +63,9 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
       );
 
     const onEdgesChange = React.useCallback(
-        (changes: EdgeChange[]) => setEdges((eds: Edge[]) => applyEdgeChanges(changes, eds)),
+        (changes: EdgeChange[]) => setEdges(() => {
+          return applyEdgeChanges(changes, store.getState().edges)
+        }),
         [setEdges]
     );
 
@@ -157,7 +163,7 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
                 onPaneMouseMove={props.onPaneMouseMove}
                 onPaneMouseLeave={props.onPaneMouseLeave}
                 nodeTypes={nodeTypes}
-                edgeTypes={props.edgeTypes}
+                edgeTypes={edgeTypes}
                 connectionLineType={props.connectionLineType}
                 connectionLineStyle={props.connectionLineStyle}
                 connectionLineComponent={props.connectionLineComponent}
@@ -222,4 +228,8 @@ const nodeTypes: NodeTypes = {
   start: Start,
   end: End,
   decision: Decision
+}
+
+const edgeTypes: EdgeTypes = {
+  buttonEdge: ButtonEdge
 }

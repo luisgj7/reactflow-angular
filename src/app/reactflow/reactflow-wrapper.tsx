@@ -51,9 +51,14 @@ import { createRoot, Root } from 'react-dom/client';
 })
 export class ReactFlowWrapperComponent implements OnChanges, OnDestroy, AfterViewInit {
   private _root: Root;
-  private _defaultEdgeOptions: DefaultEdgeOptions = {
+  /*private _defaultEdgeOptions: DefaultEdgeOptions = {
       type: ConnectionLineType.SmoothStep,
       markerEnd: { type: MarkerType.ArrowClosed },
+  }*/
+
+  private _defaultEdgeOptions: DefaultEdgeOptions = {
+    type: 'buttonEdge' ,
+    markerEnd: { type: MarkerType.ArrowClosed },
   }
 
   @Input() nodes?: Node<any, string | undefined>[] | undefined;

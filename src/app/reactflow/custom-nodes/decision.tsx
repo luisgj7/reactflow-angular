@@ -2,8 +2,9 @@ import * as React from 'react';
 import { Handle, NodeProps, Position } from "reactflow";
 import { HandleDirection } from "../reactflow";
 import { isConnectableFn } from "../validators/handle-node";
+import { ComponentType, memo, MemoExoticComponent } from "react";
 
-export const Decision = ({ id, data }: NodeProps): React.ReactElement => {
+const DecisionNode = ({ id, data }: NodeProps): React.ReactElement => {
     return (
         <div className="react-flow__node-decision content">
           <Handle
@@ -41,3 +42,5 @@ export const Decision = ({ id, data }: NodeProps): React.ReactElement => {
         </div>
     );
 };
+
+export const Decision: MemoExoticComponent<ComponentType> = memo(DecisionNode);

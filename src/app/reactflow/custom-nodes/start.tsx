@@ -2,8 +2,9 @@ import * as React from 'react';
 import { Handle, NodeProps, Position } from "reactflow";
 import { isConnectableFn } from "../validators/handle-node";
 import { HandleDirection } from "../reactflow";
+import { ComponentType, memo, MemoExoticComponent } from "react";
 
-export const Start = ({ id }: NodeProps): React.ReactElement => {
+const StartNode = ({ id }: NodeProps): React.ReactElement => {
     const hasSourceConnections = isConnectableFn(id, HandleDirection.SOURCE);
     return (
         <>
@@ -16,3 +17,5 @@ export const Start = ({ id }: NodeProps): React.ReactElement => {
         </>
     );
 };
+
+export const Start: MemoExoticComponent<ComponentType> = memo(StartNode);
