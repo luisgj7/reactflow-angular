@@ -58,6 +58,13 @@ export enum CustomNodeTypes {
   DECISION = 'decision',
   START = 'start',
   END = 'end',
+  MULTI_DECISION = 'multiDecision',
+  BUBBLE = 'bubble',
+  GROUP = 'group'
+}
+
+export enum CustomEdgeTypes {
+  BUTTON_EDGE = 'buttonEdge'
 }
 
 export enum NodeColor {
@@ -65,6 +72,12 @@ export enum NodeColor {
   END = '#e14642',
   DECISION = '#f1b46f',
   DEFAULT = '#ddf3fd'
+}
+
+export enum FlowChangeType {
+  REMOVE = 'remove',
+  ADD = 'add',
+  POSITION = 'position'
 }
 
 export interface DecisionLabelShape {
@@ -79,6 +92,7 @@ export interface IReactFlowProps {
     defaultNodes?: Node<any, string | undefined>[] | undefined;
     defaultEdges?: Edge<any>[] | undefined;
     defaultEdgeOptions?: DefaultEdgeOptions | undefined;
+    selectedNode?: Node<any, string>;
     onNodeClick?: NodeMouseHandler | undefined;
     onNodeDoubleClick?: NodeMouseHandler | undefined;
     onNodeMouseEnter?: NodeMouseHandler | undefined;

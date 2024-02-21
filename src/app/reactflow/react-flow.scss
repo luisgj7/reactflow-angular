@@ -123,6 +123,70 @@ react-flow {
         }
       }
 
+      &-multiDecision {
+        &.content {
+          width: 6.25rem;
+          height: 6.25rem;
+        }
+
+        &.shape {
+          width: 6.25rem;
+          height: 6.25rem;
+          transform: translate(-50%, -50%) rotate(45deg);
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          border: none;
+          border-radius: 2px;
+          background: #7296ef;
+        }
+
+        &.text {
+          z-index: 10;
+          position: relative;
+          font-size: 0.875rem;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          height: 100%;
+
+
+          &__label {
+            position: absolute;
+
+            &-right {
+              top: 38%;
+              transform: translate(0, -50%);
+              right: -40px;
+            }
+
+            &-bottom {
+              top: auto;
+              left: 65%;
+              transform: translate(-50%, 0);
+              bottom: -42px;
+            }
+          }
+        }
+
+        &.handle {
+          z-index: 1;
+
+          &-top {
+            top: -25px;
+          }
+
+          &-bottom {
+            bottom: -25px;
+          }
+
+          &-right {
+            right: -25px;
+          }
+        }
+      }
+
       &-end,
       &-start {
         display: flex;
@@ -155,6 +219,52 @@ react-flow {
       &-start {
         background: #57bf8d;
       }
+
+      &-group {
+        background: transparent;
+        width: 22rem;
+        height: 22rem;
+
+        &.selectable {
+          &:hover {
+            box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.2);
+            //box-shadow: unset;
+          }
+          &.selected {
+            box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.2);
+            //box-shadow: unset;
+          }
+          &:focus {
+            outline: none;
+          }
+        }
+      }
+
+      &-bubble {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        background-color: #b1e8e8;
+        border-radius: 31rem;
+        width: auto;
+        max-width: 9.5rem;
+        height: 3rem;
+        padding: 10px;
+
+        &.selectable {
+          &:hover {
+            box-shadow: 0 1px 4px 1px rgba(0, 0, 0, 0.2);
+          }
+          &.selected {
+            //box-shadow: 0 0 0 0.5px #1a192b;
+            box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.2);
+          }
+          &:focus {
+            outline: none;
+          }
+        }
+      }
     }
 
     &__handle {
@@ -163,7 +273,6 @@ react-flow {
       border: 2px solid #bdbdbd;
       background: #fff;
     }
-
 
   }
 

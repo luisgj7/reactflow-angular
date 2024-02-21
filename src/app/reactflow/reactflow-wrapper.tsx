@@ -39,7 +39,7 @@ import {
   ReactFlowInstance,
   Viewport
 } from 'reactflow';
-import { FlowWrapperComponent, IReactFlowProps } from './reactflow';
+import { CustomEdgeTypes, FlowWrapperComponent, IReactFlowProps } from './reactflow';
 import { createRoot, Root } from 'react-dom/client';
 
 @Component({
@@ -47,17 +47,11 @@ import { createRoot, Root } from 'react-dom/client';
   template: ``,
   styleUrls: ['./react-flow.scss'],
   encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ReactFlowWrapperComponent implements OnChanges, OnDestroy, AfterViewInit {
   private _root: Root;
-  /*private _defaultEdgeOptions: DefaultEdgeOptions = {
-      type: ConnectionLineType.SmoothStep,
-      markerEnd: { type: MarkerType.ArrowClosed },
-  }*/
-
   private _defaultEdgeOptions: DefaultEdgeOptions = {
-    type: 'buttonEdge' ,
+    type: CustomEdgeTypes.BUTTON_EDGE ,
     markerEnd: { type: MarkerType.ArrowClosed },
   }
 
@@ -65,6 +59,7 @@ export class ReactFlowWrapperComponent implements OnChanges, OnDestroy, AfterVie
   @Input() edges?: Edge<any>[] | undefined;
   @Input() defaultNodes?: Node<any, string | undefined>[] | undefined;
   @Input() defaultEdges?: Edge<any>[] | undefined;
+  @Input() selectedNode?: Node<any, string>;
   @Input() set defaultEdgeOptions(value: DefaultEdgeOptions) {
       if (value) {
           this._defaultEdgeOptions = value;

@@ -1,5 +1,14 @@
-import { CustomNodeTypes, DecisionLabelShape, HandleDirection, NodeColor } from "../reactflow";
-import { Edge, getConnectedEdges, Node, ReactFlowState, useReactFlow, useStore, ReactFlowInstance } from "reactflow";
+import {CustomNodeTypes, DecisionLabelShape, FlowChangeType, HandleDirection, NodeColor} from "../reactflow";
+import {
+  Edge,
+  getConnectedEdges,
+  Node,
+  ReactFlowState,
+  useReactFlow,
+  useStore,
+  ReactFlowInstance,
+  NodeChange
+} from "reactflow";
 import * as React from "react";
 
 export const isConnectableFn = (id: string, direction: HandleDirection, sourceHandle?: string): boolean => {
@@ -33,6 +42,12 @@ export const setNodeDataFn = (node: Node, labels: DecisionLabelShape): Node => {
         outRightConnId: nextId(),
         outBottomConnId: nextId()
       }
+    },
+    [CustomNodeTypes.MULTI_DECISION]: {
+      ...node,
+      data: {
+        ...node.data,
+      }
     }
   };
   return nodeMapping[node.type] || node;
@@ -45,6 +60,26 @@ export const nodeColorFn = (node: Node): string => {
     [CustomNodeTypes.DECISION]: NodeColor.DECISION,
   }
   return nodeColorMapping[node.type] || NodeColor.DEFAULT
+}
+
+export const getNodeChanges = (changes: NodeChange[], nds: Node[]): NodeChange[] => {
+  if (changes.some((change) => change.type === FlowChangeType.REMOVE
+    && nds.find((nd) => nd.id === change.id)?.type === CustomNodeTypes.MULTI_DECISION )) {
+
+    const nodes = nds.filter((node) =>
+      changes.some((nc) => {
+        return nc.type === FlowChangeType.REMOVE ? node.id.includes(nc?.id) : false
+      }))
+
+    return nodes.map((nd) => {
+      return {
+        id: nd.id,
+        type: FlowChangeType.REMOVE
+      }
+    }) as NodeChange[]
+  }
+
+  return changes;
 }
 export const nextId = (): string => {
   return window.crypto.randomUUID().split('-').pop();

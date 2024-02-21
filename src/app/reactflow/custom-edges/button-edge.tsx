@@ -10,9 +10,11 @@ import {
   useStoreApi,
   getSmoothStepPath
 } from 'reactflow';
-import { memo, MouseEvent, useState } from "react";
+import {ComponentType, memo, MemoExoticComponent, MouseEvent, useMemo, useState} from "react";
+import {FlowChangeType} from "../reactflow";
 
-const CustomEdge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {}, markerEnd}: EdgeProps) => {
+
+const CustomEdge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {}, markerEnd}: EdgeProps): React.ReactElement => {
   const [edgePath, labelX, labelY] = getSmoothStepPath(
     { sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition });
 
@@ -49,7 +51,7 @@ const Button = ({edgeId}) => {
   const store = useStoreApi();
   const onEdgeClick = (event: MouseEvent): void => {
     event.stopPropagation();
-    const changes: EdgeChange = { id: edgeId, type: "remove" };
+    const changes: EdgeChange = { id: edgeId, type: FlowChangeType.REMOVE };
 
     setEdges((currentEdges: Edge[]) => {
       const edges = applyEdgeChanges([changes], currentEdges);
@@ -68,4 +70,4 @@ const Button = ({edgeId}) => {
   );
 }
 
-export const ButtonEdge = memo(CustomEdge);
+export const ButtonEdge: MemoExoticComponent<ComponentType> = memo(CustomEdge);

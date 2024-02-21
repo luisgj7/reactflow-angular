@@ -1,5 +1,6 @@
 <div class="chart">
   <react-flow
+    [selectedNode]="selectedNode | async"
     (onNodeClick)="onNodeClick($event)"
     (onNodeAdd)="onNodeAdd($event)">
   </react-flow>

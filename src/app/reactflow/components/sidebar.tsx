@@ -22,6 +22,12 @@ export const Sidebar: FunctionComponent<unknown> = () => {
         <div className="dndnode" onDragStart={(event) => onDragStart(event, 'decision')} draggable>
           Decision Node
         </div>
+        <div className="dndnode" onDragStart={(event) => onDragStart(event, 'multiDecision')} draggable>
+          Multi Decision Node
+        </div>
+        <div className="dndnode" onDragStart={(event) => onDragStart(event, 'bubble')} draggable>
+          Bubble
+        </div>
     </aside>
   );
 };

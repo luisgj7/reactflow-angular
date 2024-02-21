@@ -15,14 +15,29 @@ import ReactFlow, {
   XYPosition,
   NodeTypes,
   EdgeTypes,
-  useStoreApi
+  useStoreApi, Edge, ConnectionLineType, MarkerType, NodePositionChange, NodeRemoveChange, EdgeRemoveChange
 } from 'reactflow';
 import { nodes as initialNodes, edges as initialEdges } from '../initial-elements';
-import { DecisionLabelShape, IReactFlowProps } from '../reactflow';
-import { Start, Decision, End } from '../custom-nodes'
-import { DragEvent } from "react";
-import { nextId, nodeColorFn, setNodeDataFn } from "../validators/handle-node";
+import {CustomNodeTypes, DecisionLabelShape, FlowChangeType, IReactFlowProps} from '../reactflow';
+import { Start, Decision, End, Bubble, MultiDecision } from '../custom-nodes'
+import {DragEvent, MouseEvent as ReactMouseEvent} from "react";
+import { getNodeChanges, nextId, nodeColorFn, setNodeDataFn} from "../validators/handle-node";
 import { ButtonEdge } from "../custom-edges/button-edge";
+import {asyncScheduler, BehaviorSubject} from "rxjs";
+import {Simulate} from "react-dom/test-utils";
+
+
+const nodeTypes: NodeTypes = {
+  start: Start,
+  end: End,
+  bubble: Bubble,
+  decision: Decision,
+  multiDecision: MultiDecision,
+}
+
+const edgeTypes: EdgeTypes = {
+  buttonEdge: ButtonEdge
+}
 
 export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
     const minimapStyle = {
@@ -32,6 +47,9 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
       outRightConnection: "Yes",
       outBottomConnection: "No"
     }
+
+    const edgeSelected = new BehaviorSubject<Edge>(null);
+    const selectedNode: Node<any, string> = props.selectedNode;
 
     const store = useStoreApi();
 
@@ -44,6 +62,7 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
 
     const onConnect = React.useCallback(
       (params: Connection) => setEdges(() => {
+        console.log('params: ', params);
         return addEdge({...params}, store.getState().edges)
       }),
       []);
@@ -55,18 +74,44 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
         }, [ nodes, setIsValidDrawLine]
     );
 
-    const onNodesChange = React.useCallback(
-        (changes: NodeChange[]): void => {
-            setNodes((nds: Node[]) => applyNodeChanges(changes, nds))
-        },
-        [setNodes]
-      );
+    const onNodesChange = React.useCallback((changes: NodeChange[]): void => {
+      return setNodes((nds: Node[]) => {
+        const removeChanges: NodeRemoveChange[] = changes.filter((change) => change.type === FlowChangeType.REMOVE) as NodeRemoveChange[];
+
+        if (removeChanges.length) {
+          const isChip = nds.some((node) =>
+            removeChanges.some((nc) => node.id === nc.id && node.type === CustomNodeTypes.BUBBLE));
+
+          console.log('isChip:', isChip);
+          if (isChip) {
+            return applyNodeChanges([], nds);
+          }
+        }
+
+        return applyNodeChanges(getNodeChanges(changes, nds), nds);
+      });
+      },
+      [setNodes, getNodeChanges]
+    );
 
     const onEdgesChange = React.useCallback(
-        (changes: EdgeChange[]) => setEdges(() => {
-          return applyEdgeChanges(changes, store.getState().edges)
+        (changes: EdgeChange[]) =>
+          setEdges((edges: Edge[]) => {
+
+          const removeChanges: EdgeRemoveChange[] = changes.filter((change) => change.type === FlowChangeType.REMOVE) as EdgeRemoveChange[];
+
+          if (removeChanges.length) {
+            const [change] = removeChanges;
+            const edge = edges.find((ed) => ed.id === change.id);
+            const nodeSourceType = nodes.find((node) => node.id === edge.target)?.type;
+
+            if (nodeSourceType === CustomNodeTypes.BUBBLE) {
+              return applyEdgeChanges([], edges);
+            }
+          }
+          return applyEdgeChanges([...changes], store.getState().edges);
         }),
-        [setEdges]
+        [setEdges, nodes, store]
     );
 
     const onDragOver = React.useCallback((event: DragEvent): void => {
@@ -90,22 +135,129 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
                 x: event.clientX - reactFlowBounds.left,
                 y: event.clientY - reactFlowBounds.top,
             });
-            const newNode: Node = setNodeDataFn(
-              {
-                id: nextId(),
-                type,
-                position,
-                data: { label: `${type} node` },
-              },
-              decisionLabel
-            );
 
-            setNodes((nds: Node[]) => {
+
+            const nodeId = nextId();
+
+            if (type === CustomNodeTypes.MULTI_DECISION) {
+
+              const group: Node = {
+                  id: `${nodeId}-${CustomNodeTypes.GROUP}`,
+                  data: {label: 'Group'},
+                  position: {
+                    x: position.x - 160,
+                    y: position.y - 160
+                  },
+                  type: CustomNodeTypes.GROUP
+                };
+
+              const newNode = setNodeDataFn(
+                {
+                  id: nodeId,
+                  type,
+                  position: {
+                    x: 130,
+                    y: 60
+                  },
+                  data: { label: `${type} node` },
+                  parentNode: `${nodeId}-${CustomNodeTypes.GROUP}`,
+                  extent: 'parent',
+                },
+                decisionLabel
+              );
+
+              const extras: Node[] = [
+                {
+                  id: newNode.id + '-1',
+                  type: CustomNodeTypes.BUBBLE,
+                  position: {x: newNode.position.x - 80, y: newNode.position.y + 200},
+                  data: { label: 'bubble 1'},
+                  parentNode: `${nodeId}-${CustomNodeTypes.GROUP}`,
+                  extent: 'parent'
+                },
+                {
+                  id: newNode.id + '-2',
+                  type: CustomNodeTypes.BUBBLE,
+                  position: {x: newNode.position.x + 10, y: newNode.position.y + 200},
+                  data: { label: 'bubble 2'},
+                  parentNode: `${nodeId}-${CustomNodeTypes.GROUP}`,
+                  extent: 'parent'
+                },
+                {
+                  id: newNode.id + '-3',
+                  type: CustomNodeTypes.BUBBLE,
+                  position: {x: newNode.position.x + 100, y: newNode.position.y + 200},
+                  data: { label: 'bubble 3'},
+                  parentNode: `${nodeId}-${CustomNodeTypes.GROUP}`,
+                  extent: 'parent'
+                }
+              ];
+
+
+              setNodes((nds: Node[]) => {
                 props.onNodeAdd(newNode);
-                return nds.concat(newNode);
-            });
-        },[reactFlowInstance, props, decisionLabel]
+                return nds.concat([group, newNode, ...extras])
+              });
+
+              asyncScheduler.schedule(() => {
+                const edgesChange = extras.map((bubble, index) => {
+                    return {
+                      item: {
+                        id: nextId(),
+                        type: ConnectionLineType.Straight,
+                        source: `${newNode.id}`,
+                        target: `${newNode.id}-${(1 + index)}`,
+                        markerEnd: {
+                          type: MarkerType.ArrowClosed,
+                        },
+                      },
+                      type: FlowChangeType.ADD
+                    }
+                  }) as EdgeChange[]
+                setEdges(() => applyEdgeChanges(edgesChange, store.getState().edges));
+              });
+            }
+
+            else {
+              const newNode = setNodeDataFn(
+                {
+                  id: nodeId,
+                  type,
+                  position,
+                  data: { label: `${type} node` },
+                },
+                decisionLabel
+              );
+
+              setNodes((nds: Node[]) => {
+                props.onNodeAdd(newNode);
+                return nds.concat([newNode]);
+              });
+            }
+
+        },[reactFlowInstance, props, decisionLabel, store]
     );
+
+    /*const onEdgeClick = React.useCallback(
+      (_, edge) => {
+      console.log('useCallback::edge:', edge);
+      edgeSelected.next(edge);
+      console.log('edgeSelected: ',edgeSelected?.getValue());
+    }, [edgeSelected]);*/
+
+    const onNodeClickFn = React.useCallback(
+      (event: ReactMouseEvent, node: Node): void => {
+
+        if ([CustomNodeTypes.GROUP.toString(), CustomNodeTypes.BUBBLE.toString()].includes(node.type)) {
+          const [nodeId] = node.id.split('-');
+          const nodeSelected = nodes.find((nc) => nc.id === nodeId);
+          return props.onNodeClick(event, nodeSelected);
+        }
+
+        return props.onNodeClick(event, node);
+      }, [props.onNodeClick, nodes])
+
+
 
     return (
         <div className="flow-content" ref={reactFlowWrapper}>
@@ -119,7 +271,7 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
                 onInit={setReactFlowInstance}
                 onDrop={onDrop}
                 onDragOver={onDragOver}
-                onNodeClick={props.onNodeClick}
+                onNodeClick={onNodeClickFn}
                 onNodeDoubleClick={props.onNodeDoubleClick}
                 onNodeMouseEnter={props.onNodeMouseEnter}
                 onNodeMouseMove={props.onNodeMouseMove}
@@ -222,14 +374,4 @@ export const Flow: React.FunctionComponent<IReactFlowProps> = ({props}) => {
             </ReactFlow>
         </div>
     );
-}
-
-const nodeTypes: NodeTypes = {
-  start: Start,
-  end: End,
-  decision: Decision
-}
-
-const edgeTypes: EdgeTypes = {
-  buttonEdge: ButtonEdge
 }
