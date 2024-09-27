@@ -1,6 +1,5 @@
 import {
   AfterViewInit,
-  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Input,
@@ -215,8 +214,6 @@ export class ReactFlowWrapperComponent implements OnChanges, OnDestroy, AfterVie
           }
       };
       reactFlow.props.defaultEdgeOptions = this._defaultEdgeOptions;
-
-      console.log(reactFlow.props);
 
       this._root.render(<FlowWrapperComponent props={reactFlow.props} />);
   }

@@ -15,16 +15,15 @@ import ReactFlow, {
   XYPosition,
   NodeTypes,
   EdgeTypes,
-  useStoreApi, Edge, ConnectionLineType, MarkerType, NodePositionChange, NodeRemoveChange, EdgeRemoveChange
+  useStoreApi, Edge, ConnectionLineType, MarkerType, NodeRemoveChange, EdgeRemoveChange
 } from 'reactflow';
 import { nodes as initialNodes, edges as initialEdges } from '../initial-elements';
-import {CustomNodeTypes, DecisionLabelShape, FlowChangeType, IReactFlowProps} from '../reactflow';
-import { Start, Decision, End, Bubble, MultiDecision } from '../custom-nodes'
-import {DragEvent, MouseEvent as ReactMouseEvent} from "react";
+import { CustomNodeTypes, DecisionLabelShape, FlowChangeType, IReactFlowProps } from '../reactflow';
+import { Start, Decision, End, Bubble, MultiDecision, MultiNode } from '../custom-nodes'
+import { DragEvent, MouseEvent as ReactMouseEvent } from "react";
 import { getNodeChanges, nextId, nodeColorFn, setNodeDataFn} from "../validators/handle-node";
 import { ButtonEdge } from "../custom-edges/button-edge";
-import {asyncScheduler, BehaviorSubject} from "rxjs";
-import {Simulate} from "react-dom/test-utils";
+import { asyncScheduler, BehaviorSubject } from "rxjs";
 
 
 const nodeTypes: NodeTypes = {
@@ -33,6 +32,7 @@ const nodeTypes: NodeTypes = {
   bubble: Bubble,
   decision: Decision,
   multiDecision: MultiDecision,
+  multiNode: MultiNode
 }
 
 const edgeTypes: EdgeTypes = {

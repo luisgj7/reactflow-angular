@@ -9,25 +9,28 @@ export const Sidebar: FunctionComponent<unknown> = () => {
 
   return (
     <aside>
-      <div className="description">You can drag these nodes to the pane on the right.</div>
-        <div className="dndnode" onDragStart={(event) => onDragStart(event, 'start')} draggable>
-          Start Node
-        </div>
-        <div className="dndnode" onDragStart={(event) => onDragStart(event, 'end')} draggable>
-          End Node
-        </div>
-        <div className="dndnode" onDragStart={(event) => onDragStart(event, 'default')} draggable>
-          Default Node
-        </div>
-        <div className="dndnode" onDragStart={(event) => onDragStart(event, 'decision')} draggable>
-          Decision Node
-        </div>
-        <div className="dndnode" onDragStart={(event) => onDragStart(event, 'multiDecision')} draggable>
-          Multi Decision Node
-        </div>
-        <div className="dndnode" onDragStart={(event) => onDragStart(event, 'bubble')} draggable>
-          Bubble
-        </div>
+      <div className="description">You can drag these nodes to the pane on the canvas.</div>
+      <div className="dndnode" onDragStart={(event) => onDragStart(event, 'start')} draggable>
+        Start Node
+      </div>
+      <div className="dndnode" onDragStart={(event) => onDragStart(event, 'end')} draggable>
+        End Node
+      </div>
+      <div className="dndnode" onDragStart={(event) => onDragStart(event, 'default')} draggable>
+        Default Node
+      </div>
+      <div className="dndnode" onDragStart={(event) => onDragStart(event, 'decision')} draggable>
+        Decision Node
+      </div>
+      <div className="dndnode" onDragStart={(event) => onDragStart(event, 'multiDecision')} draggable>
+        Multi Decision Node
+      </div>
+      <div className="dndnode" onDragStart={(event) => onDragStart(event, 'multiNode')} draggable>
+        Multi  Node
+      </div>
+      <div className="dndnode" onDragStart={(event) => onDragStart(event, 'bubble')} draggable>
+        Bubble
+      </div>
     </aside>
   );
 };
